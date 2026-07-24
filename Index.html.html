@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Rompecabezas - AC Administración de Clientes</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    margin:20px;
+    background:#f3f6fa;
+}
+
+h2{
+    text-align:center;
+    color:#004b8d;
+}
+
+#contenedor{
+
+    width:1200px;
+    margin:auto;
+
+}
+
+#tablero{
+
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    grid-template-rows:repeat(2,320px);
+    gap:0;
+    border:3px solid #004b8d;
+
+}
+
+.casilla{
+
+    border:1px solid #999;
+    background:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+}
+
+.pieza{
+
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    cursor:grab;
+
+}
+
+.arriba{
+
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:10px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+    color:#003c74;
+    line-height:1.3;
+
+}
+
+.abajo{
+
+    flex:1;
+
+}
+
+.imagen{
+
+    width:100%;
+    height:100%;
+    background-image:url("plaza.jpg");
+    background-size:400% 200%;
+    background-repeat:no-repeat;
+
+}
+
+#mensaje{
+
+    text-align:center;
+    margin-top:20px;
+    font-size:24px;
+    color:green;
+    font-weight:bold;
+
+}
+
+</style>
+
+</head>
+<body>
+
+<h2>Rompecabezas - Ingreso a AC Administración de Clientes</h2>
+
+<div id="contenedor">
+
+<div id="tablero"></div>
+
+<div id="mensaje"></div>
+
+</div>
+
+<script>
+
+const textos=[
+
+"Ingresa a la herramienta AC Administración de Clientes y en el apartado Conexión a RED digita tu contraseña.",
+
+"En la opción Base de datos selecciona AC PRODUCCIÓN y da clic en Aceptar.",
+
+"En CRITERIOS DE BÚSQUEDA selecciona MIN/MSISDN para ingresar con el número de la línea celular o NIT/CÉDULA para ingresar con el documento del titular.",
+
+"En Criterio digita el número de línea celular o el documento de identificación del cliente.",
+
+"Da clic en BUSCAR.",
+
+"Selecciona la cuenta que necesitas consultar.",
+
+"Haz clic en el botón Consultar.",
+
+"Una vez ingreses a la cuenta valida nombres completos e identificación del titular, confirmando exactamente la información."
+
+];
+
+const posiciones=[
+
+"0% 0%",
+"33.333% 0%",
+"66.666% 0%",
+"100% 0%",
+
+"0% 100%",
+"33.333% 100%",
+"66.666% 100%",
+"100% 100%"
+
+];
+
+let orden=[0,1,2,3,4,5,6,7];
+
+orden.sort(()=>Math.random()-0.5);
+
+const tablero=document.getElementById("tablero");
+
+orden.forEach(indice=>{
+
+const casilla=document.createElement("div");
+casilla.className="casilla";
+
+casilla.ondragover=e=>e.preventDefault();
+
+casilla.ondrop=soltar;
+
+const pieza=document.createElement("div");
+pieza.className="pieza";
+pieza.draggable=true;
+pieza.dataset.correcto=indice;
+
+pieza.ondragstart=arrastrar;
+
+const texto=document.createElement("div");
+texto.className="arriba";
+texto.innerHTML=textos[indice];
+
+const imagen=document.createElement("div");
+imagen.className="abajo imagen";
+imagen.style.backgroundPosition=posiciones[indice];
+
+if(indice<4){
+
+pieza.appendChild(texto);
+pieza.appendChild(imagen);
+
+}else{
+
+pieza.appendChild(imagen);
+pieza.appendChild(texto);
+
+}
+
+casilla.appendChild(pieza);
+
+tablero.appendChild(casilla);
+
+});
+
+let origen=null;
+
+function arrastrar(e){
+
+origen=this.parentNode;
+
+e.dataTransfer.setData("text","");
+
+window.piezaActual=this;
+
+}
+
+function soltar(e){
+
+e.preventDefault();
+
+let destino=this;
+
+if(destino===origen) return;
+
+destino.appendChild(window.piezaActual);
+
+origen.appendChild(destino.querySelector(".pieza"));
+
+validar();
+
+}
+
+function validar(){
+
+let correcto=true;
+
+document.querySelectorAll(".casilla").forEach((c,i)=>{
+
+const p=c.querySelector(".pieza");
+
+if(Number(p.dataset.correcto)!==i){
+
+correcto=false;
+
+}
+
+});
+
+if(correcto){
+
+document.getElementById("mensaje").innerHTML="🎉 ¡Excelente! Has completado correctamente el rompecabezas.";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
